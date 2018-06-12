@@ -65,8 +65,14 @@ MAKE_FLAGS+= \
 	LDFLAGS="-lrt -lpthread -lpcap `$(PKG_CONFIG) --libs libcrypto`"
 
 define Package/ieee1905/install
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/output/al_entity $(1)/usr/bin/
+	$(INSTALL_DIR) $(1)/usr/sbin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/output/al_entity $(1)/usr/sbin/
+	$(INSTALL_DIR) $(1)/etc/config/
+	$(INSTALL_DATA) ./files/ieee1905.config $(1)/etc/config/ieee1905
+	$(INSTALL_DIR) $(1)/etc/init.d/
+	$(INSTALL_BIN) ./files/ieee1905.init $(1)/etc/init.d/ieee1905
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
+	$(INSTALL_DATA) ./files/ieee1905.hotplug $(1)/etc/hotplug.d/iface/ieee1905
 endef
 
 $(eval $(call BuildPackage,ieee1905))

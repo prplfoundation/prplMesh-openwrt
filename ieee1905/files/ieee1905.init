@@ -1,0 +1,60 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2018 prpl foundation
+
+START=25
+STOP=10
+USE_PROCD=1
+
+IFACES=
+
+service_triggers()
+{
+	procd_add_reload_trigger "ieee1905"
+}
+
+ieee1905_interface()
+{
+	local iface="$1"
+
+	[ -n "$IFACES" ] && IFACES="${IFACES},"
+	IFACES="${IFACES}${iface}"
+}
+
+start_service()
+{
+	. /lib/functions.sh
+	. /lib/functions/network.sh
+
+	procd_open_instance
+
+	procd_set_param respawn ${respawn_threshold:-120} ${respawn_timeout:-5} ${respawn_retry:-5}
+
+	# Log to logd
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+
+	procd_set_param command /usr/sbin/al_entity
+
+	# Uncomment this for verbose logging
+	procd_append_param command -v -v
+
+
+	config_load ieee1905
+
+	config_list_foreach ieee1905 interface ieee1905_interface
+	[ -n "$IFACES" ] || return 0
+	procd_append_param command -i "$IFACES"
+
+	local val
+
+	config_get val ieee1905 al_address
+	# TODO use default address if none is configured
+	[ -n "$val" ] || return 1
+	procd_append_param command -m "${val}"
+
+	config_get val ieee1905 port
+	[ -n "$val" ] && procd_append_param command -p "${val}"
+
+	procd_close_instance
+}
+
