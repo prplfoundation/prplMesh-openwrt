@@ -9,10 +9,10 @@ IFACES=
 
 service_triggers()
 {
-	procd_add_reload_trigger "ieee1905"
+	procd_add_reload_trigger "prplmesh"
 }
 
-ieee1905_interface()
+prplmesh_interface()
 {
 	local iface="$1"
 
@@ -39,20 +39,20 @@ start_service()
 	procd_append_param command -v -v
 
 
-	config_load ieee1905
+	config_load prplmesh
 
-	config_list_foreach ieee1905 interface ieee1905_interface
+	config_list_foreach prplmesh interface prplmesh_interface
 	[ -n "$IFACES" ] || return 0
 	procd_append_param command -i "$IFACES"
 
 	local val
 
-	config_get val ieee1905 al_address
+	config_get val prplmesh al_address
 	# TODO use default address if none is configured
 	[ -n "$val" ] || return 1
 	procd_append_param command -m "${val}"
 
-	config_get val ieee1905 port
+	config_get val prplmesh port
 	[ -n "$val" ] && procd_append_param command -p "${val}"
 
 	procd_close_instance
