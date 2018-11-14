@@ -8,18 +8,26 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=prplmesh
-PKG_VERSION:=35a53f6fed1d8525adea866f6fcf4af83564b336
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://github.com/prplfoundation/prplMesh/archive/$(PKG_VERSION)/$(PKG_SOURCE)
-PKG_MD5SUM:=07ad7ae4a2fd9a67adb4780f82c7fa3521f5706db7be6518d44358002a78b01d
-PKG_BUILD_DIR:=$(BUILD_DIR)/prplMesh-$(PKG_VERSION)
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/prplfoundation/prplMesh.git
+PKG_SOURCE_DATE:=2018-11-16
+PKG_SOURCE_VERSION:=cf26760f4da6e8ef7a04ff5b792d5a3d71018525
+PKG_MIRROR_HASH:=b8b8878b013802da41410802dc50208051e335432a2e35fa6e6f39bfa36f3338
+
+#PKG_VERSION:=1.0.0
+#PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+#PKG_SOURCE_URL:=https://github.com/prplfoundation/prplMesh/archive/$(PKG_VERSION)/$(PKG_SOURCE)
+#PKG_HASH:=07ad7ae4a2fd9a67adb4780f82c7fa3521f5706db7be6518d44358002a78b01d
+
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
+
+CMAKE_OPTIONS += -DOPENWRT=TRUE
 
 define Package/prplmesh
   SECTION:=net
