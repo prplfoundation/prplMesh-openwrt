@@ -9,7 +9,16 @@ IFACES=
 
 service_triggers()
 {
+	local interfaces
+	local iface
+
 	procd_add_reload_trigger "prplmesh"
+
+	config_load prplmesh
+	config_get interfaces prplmesh interfaces
+	for iface in $interfaces; do
+		procd_add_reload_interface_trigger $iface
+	done
 }
 
 prplmesh_interface()

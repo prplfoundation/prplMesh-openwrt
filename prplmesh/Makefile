@@ -45,8 +45,6 @@ define Package/prplmesh/install
 	$(INSTALL_DATA) ./files/prplmesh.config $(1)/etc/config/prplmesh
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) ./files/prplmesh.init $(1)/etc/init.d/prplmesh
-	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
-	$(INSTALL_DATA) ./files/prplmesh.hotplug $(1)/etc/hotplug.d/iface/prplmesh
 endef
 
 $(eval $(call BuildPackage,prplmesh))
