@@ -30,3 +30,4 @@ By making a contribution to this project, I certify that:
 (d) 	I understand and agree that this project and the contribution are public and that a record of the contribution (including all personal information I submit with it, including my sign-off) is maintained indefinitely and may be redistributed consistent with this project or the open source license(s) involved.
 
 Arnout Vandecappelle <arnout.vandecappelle@essensium.com>
+Daniel Golle <daniel@makrotopia.org>
