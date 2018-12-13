@@ -34,6 +34,9 @@ start_service()
 	. /lib/functions.sh
 	. /lib/functions/network.sh
 
+	# 1905.1 protocol packets must not be bridged
+	ebtables -t broute -A BROUTING -p 0x893a -j DROP
+
 	procd_open_instance
 
 	procd_set_param respawn ${respawn_threshold:-120} ${respawn_timeout:-5} ${respawn_retry:-5}
