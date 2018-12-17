@@ -35,7 +35,7 @@ define Package/prplmesh
   TITLE:=An implementation of the Wi-Fi Alliance Multi-AP Specification
   URL:=https://github.com/prplfoundation/prplMesh
   MAINTAINER:=Arnout Vandecappelle (Essensium/Mind) <arnout@mind.be>
-  DEPENDS:=+libnl-core +libnl-genl +libopenssl +libpthread +librt +libubox +libubus +rpcd +rpcd-mod-iwinfo @!BIG_ENDIAN
+  DEPENDS:=+ebtables +libnl-core +libnl-genl +libopenssl +libpthread +librt +libubox +libubus +rpcd +rpcd-mod-iwinfo @!BIG_ENDIAN
 endef
 
 define Package/prplmesh/description
