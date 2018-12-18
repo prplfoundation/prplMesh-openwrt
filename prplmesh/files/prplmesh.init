@@ -21,14 +21,6 @@ service_triggers()
 	done
 }
 
-prplmesh_interface()
-{
-	local iface="$1"
-
-	[ -n "$IFACES" ] && IFACES="${IFACES},"
-	IFACES="${IFACES}${iface}"
-}
-
 start_service()
 {
 	. /lib/functions.sh
@@ -45,7 +37,7 @@ start_service()
 	procd_set_param stdout 1
 	procd_set_param stderr 1
 
-	procd_set_param command /usr/sbin/al_entity
+	procd_set_param command /usr/sbin/prplmesh
 
 	# Uncomment this for verbose logging
 	procd_append_param command -v -v
@@ -53,16 +45,7 @@ start_service()
 
 	config_load prplmesh
 
-	config_list_foreach prplmesh interface prplmesh_interface
-	[ -n "$IFACES" ] || return 0
-	procd_append_param command -i "$IFACES"
-
 	local val
-
-	config_get val prplmesh al_address
-	# TODO use default address if none is configured
-	[ -n "$val" ] || return 1
-	procd_append_param command -m "${val}"
 
 	config_get val prplmesh port
 	[ -n "$val" ] && procd_append_param command -p "${val}"
