@@ -53,13 +53,13 @@ To set up an unconfigured device that can be onboarded with push-button configur
 
 ```
 
+At the moment, prplMesh does not yet detect the new interface, so it needs to be restarted by hand, with `/etc/init.d/prplmesh restart`.
+
 Push-button configuration can be started with:
 
 ```sh
 ACTION=pressed BUTTON=wps /etc/rc.button/wps
 ```
-
-At the moment, prplMesh does not yet detect the new interface, so it needs to be restarted by hand, with `/etc/init.d/prplmesh restart`.
 
 prplMesh will then start to perform AP-Autoconfiguration over the new interface. It will get the AP information from the controller and configure the APs.
 
