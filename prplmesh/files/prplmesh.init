@@ -5,22 +5,6 @@ START=25
 STOP=10
 USE_PROCD=1
 
-IFACES=
-
-service_triggers()
-{
-	local interfaces
-	local iface
-
-	procd_add_reload_trigger "prplmesh"
-
-	config_load prplmesh
-	config_get interfaces prplmesh interfaces
-	for iface in $interfaces; do
-		procd_add_reload_interface_trigger $iface
-	done
-}
-
 start_service()
 {
 	. /lib/functions.sh
@@ -40,15 +24,7 @@ start_service()
 	procd_set_param command /usr/sbin/prplmesh
 
 	# Uncomment this for verbose logging
-	procd_append_param command -v -v
-
-
-	config_load prplmesh
-
-	local val
-
-	config_get val prplmesh port
-	[ -n "$val" ] && procd_append_param command -p "${val}"
+	# procd_append_param command -v -v
 
 	procd_close_instance
 }
