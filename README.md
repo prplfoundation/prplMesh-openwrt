@@ -19,7 +19,7 @@ WFA Multi-AP networks utilize multiple APs that work together to ensure all area
 
 ## How to add the prplMesh Feed to you OpenWrt/LEDE build
 
-prplMesh requires a modified hostapd which is not yet in upstream OpenWRT. Therefore, you need to use hostapd-multi-ap-v3 branch from https://github.com/prplfoundation/openwrt
+prplMesh requires a modified hostapd which is not yet in upstream OpenWRT. Therefore, you need to use multiap-upstream branch from https://git.openwrt.org/openwrt/staging/dangole.git
 
 At the root of your OpenWrt/LEDE tree, add the following to your `feeds.conf` file:
 ```sh
