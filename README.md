@@ -4,6 +4,35 @@ This feed contains packages for enabling WFA Multi-AP on a router.
 
 This work was sponsored by [prpl Foundation](https://prplfoundation.org/).
 
+## tch-rebase
+
+This branch is a WIP for rebasing on the code contributed by Technicolor. Therefore, the information in the following sections is not correct for the time being.
+
+This is how things can be tested for the time being.
+
+* The versions in the Makefiles are not correct, except for transformer-tch. Instead, you have to manually clone the 4 repositories and create a git-src symlink to each. E.g.:
+```
+cd ieee1905; ln -s ../../ieee1905 git-src
+```
+
+* Check out the `prpl` branch in each repo.
+
+* Enable the agent in menuconfig. The rest should be automatically selected.
+
+* Build `multiap_agent` and copy it to the target.
+
+* Create `/etc/config/multiap`
+```
+config agent 'agent'
+        option macaddress '03:04:05:06:0a:0b'
+        option default_hysteresis_margin '400'
+```
+
+* A lot of environment variables need to be set. You can call it as follows:
+```
+AL_ENTITY_TOPOLOGY_DISCOVERY_INTERVAL=60 MAP_MODEL_NUMBER=0 MAP_MANUFACTURER_NAME=x MAP_SERIAL_NUMBER=1 MAP_MODEL_NAME=foo MAP_INTERFACES=lo,lan0,lan1 MAP_AGENT_MACADDRESS=03:04:05:06:0a:0b multiap_agent -l 7 -s -m ubus
+```
+
 
 ## What is WFA Multi-AP?
 
