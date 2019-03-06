@@ -25,7 +25,7 @@ define Package/$(PKG_NAME)
 	SECTION:=net
 	CATEGORY:=Network
 	TITLE:=MultiAP Agent
-	DEPENDS:=+@KERNEL_POSIX_MQUEUE +libpthread +libuv +multiap_libplatform
+	DEPENDS:=+@KERNEL_POSIX_MQUEUE +libpthread +libuv +multiap_libplatform +ieee1905
 	MAINTAINER:=Arnout Vandecappelle (Essensium/Mind) <arnout@mind.be>
 endef
 
