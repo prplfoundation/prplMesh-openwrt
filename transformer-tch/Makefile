@@ -49,7 +49,8 @@ define Build/InstallDev
 endef
 
 define Package/transformer-tch/install
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/libtransformer.so $(1)/usr/lib
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/lib/libtransformer.so $(1)/usr/lib
 endef
 
 $(eval $(call BuildPackage,transformer-tch))
