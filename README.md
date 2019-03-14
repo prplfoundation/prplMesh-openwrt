@@ -66,3 +66,83 @@ prplMesh will then start to perform AP-Autoconfiguration over the new interface.
 To configure a controller, add sections of type `registrar` to the UCI configurationo of prplMesh. This section must at least contain the option `ssid` with the SSID to configure.
 It can also contain the option `key` with the encryption key, which sets WPA2-PSK on that SSID. Setting the option `backhaul` to 1 enables Multi-AP backhaul functionality on this AP. If also `backhaul_only` is set to 1, it is a backhaul-only AP, otherwise it is both backhaul and fronthaul. Finally, the bands can be selected with the `band` option: 1 for 2.4GHz, 2 for 5GHz, and 3 for both.
 
+## Installing OpenWrt with Purple Mesh on Turris Omnia for the first time
+
+### Materials
+
+- Make sure you have a serial cable plugged into the 3 leftmost pins inside the Omnia next to the LED lights.  Left to Right: Black Yellow Orange
+
+- TFTP Server available on your network
+
+- An Ethernet cable from the host computer to any Omnia Lan Port
+
+- An ethernet cable in the Omnia Wan Port to a DHCP server for the network containing the TFTP Server
+
+- Files: 
+  - omni-medkit-openwrt-mvebu-cortexa9-turris-omnia-initramfs.tar.gz 
+  - openwrt-mvebu-cortexta9-turris-omnia-sysupgade.img.gz
+
+### Setup
+
+- Unzip the medkit file.  It will create ./boot/dtb and ./boot/zImage
+
+- Place these files on your TFTP server 
+
+- Plug your serial cable into the serial pins on the Omnia Left to Right: Black Yellow Orange
+  - Note 4 pin should **not** be used.  
+
+- Connect to the Omnia over serial
+
+- *screen /dev/ttyUSB0 115200*  
+
+## Ramdisk
+
+- Reset the Omnia by holding in the reset until 4 lights are shown then release
+
+- Omnia will reboot
+
+- Interrupt uboot in the serial terminal console by hitting enter a few times
+
+- Should get a => prompt
+
+- Type `dhcp` 
+
+- this should get an ip address from the dhcp server
+  - *Note this will fail getting the tftp server because it’s not set*
+
+```sh
+=>setenv serverip <TFTP server IP address>
+=>tftpboot 0x01000000 zImage
+=>tftpboot 0x02000000 dtb
+=>bootz 0x01000000 – 0x02000000
+```
+
+- Once the boot is done, from another terminal copy the sysupgrad to the Omnia
+
+```bash
+$scp openwrt-mvebu-cortexta9-turris-omnia-sysupgade.img.gz root@192.168.1.1:/tmp 
+```
+
+- Log into the Omnia through ssh and run sysupgrade
+
+```shell
+$ssh root@192.168.1.1
+=>sysupgrade /tmp/openwrt-mvebu-cortexta9-turris-omnia-sysupgade.img.gz
+
+```
+
+- This should chug and churn for a while with lights flashing.  If all goes well, the Omnia will reboot itself and you should see on the serial console
+
+> OpenWRT. Wireless Freedom. OpenWrt SNAPSHOT r8703-e056a9cdbe (or some such)
+
+### Possible Issues
+
+- If the Omnia gets in a weird state (e.g. can’t find kernel) reset the environment
+
+```sh
+env default -a
+saveenv
+```
+
+- If all else fails, try reseting by holding in the reset until 4 lights are shown then release
+
