@@ -28,6 +28,8 @@ config agent 'agent'
         option default_hysteresis_margin '400'
 ```
 
+* Pre-allocate wireless interface. For the time being, multiap wireless interfaces have to be configured up-front in UCI. Details TBD.
+
 * A lot of environment variables need to be set. You can call it as follows:
 ```
 AL_ENTITY_TOPOLOGY_DISCOVERY_INTERVAL=60 MAP_MODEL_NUMBER=0 MAP_MANUFACTURER_NAME=x MAP_SERIAL_NUMBER=1 MAP_MODEL_NAME=foo MAP_INTERFACES=lo,lan0,lan1 MAP_AGENT_MACADDRESS=03:04:05:06:0a:0b multiap_agent -l 7 -s -m ubus
