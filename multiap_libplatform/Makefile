@@ -25,7 +25,7 @@ define Package/$(PKG_NAME)
 	SECTION:=net
 	CATEGORY:=Network
 	TITLE:=MultiAP Agent
-	DEPENDS:=+libpthread +libuv +libuci +libc +jansson +libubus +libubox +transformer-tch +iwinfo
+	DEPENDS:=+libpthread +libuv +libuci +libc +jansson +libubus +libubox +iwinfo
 	MAINTAINER:=Arnout Vandecappelle (Essensium/Mind) <arnout@mind.be>
 endef
 

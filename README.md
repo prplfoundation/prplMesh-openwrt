@@ -10,7 +10,7 @@ This branch is a WIP for rebasing on the code contributed by Technicolor. Theref
 
 This is how things can be tested for the time being.
 
-* The versions in the Makefiles are not correct, except for transformer-tch. Instead, you have to manually clone the 4 repositories and create a git-src symlink to each. E.g.:
+* The versions in the Makefiles are not correct. Instead, you have to manually clone the 4 repositories and create a git-src symlink to each. E.g.:
 ```
 cd ieee1905; ln -s ../../ieee1905 git-src
 ```
