@@ -1,0 +1,37 @@
+menu "Configuration"
+	depends on PACKAGE_prplmesh
+
+config PRPLMESH_AGENT
+	bool "Instal PurpleMesh Agent"
+	default y
+	help
+		This enables the EasyMesh agent functionality.
+		There can multiple EasyMesh agents, but only one controller on a LAN.
+		Typically, the LAN router/gateway acts as both the agent and controller,
+		and extenders and/or access points are the agents only.
+
+config PRPLMESH_CONTROLLER
+	bool "Instal PurpleMesh Controller"
+	default y
+	help
+		This enables the EasyMesh controller functionality.
+		There can be only one EasyMesh controler on a LAN.
+		Typically, the LAN router/gateway acts as the controller.
+		You can keep this option enabled and disable the controller
+		daemon manually if it is not needed. Disabling this option allows
+		to save a few hundered kilobytes of flash.
+
+config PRPLMESH_BWL_HAL
+	string "Wireless Hardware Abstraction Layer"
+	default "NL80211"
+	help
+		This allows to choose the wireless hardware abstraction layer type.
+		Unless you know what you are doing keep this option at its default.
+
+config PRPLMESH_BUILD_TYPE
+	string "Build Type Debug/Release"
+	default "Release"
+	help
+		Allows to chose build type.
+
+endmenu
