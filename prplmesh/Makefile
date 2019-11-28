@@ -13,13 +13,16 @@ PKG_RELEASE:=2
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/prplfoundation/prplMesh.git
 PKG_SOURCE_DATE:=2019-11-14
-PKG_SOURCE_VERSION:=7f287c810ea16483567560cf63c5c23b216e8e0c
+PKG_SOURCE_VERSION:=d291c55dadb02e3025f5a825f20db1c5a7b9c87f
 PKG_MIRROR_HASH:=skip
 
 PKG_LICENSE:=BSD-2-Clause-Patent
 PKG_LICENSE_FILES:=LICENSE
 
 PKG_PRPL_SUBDIR:=prplMesh
+PKG_PRPL_BIN_PATH:=/opt/beerocks/bin
+PKG_PRPL_LIB_PATH:=/usr/lib
+PKG_PRPL_CFG_PATH:=/etc/beerocks
 
 PKG_BUILD_DEPENDS:=python/host
 
@@ -33,8 +36,8 @@ define Package/prplmesh
   URL:=https://github.com/prplfoundation/prplMesh
   MAINTAINER:=Arnout Vandecappelle (Essensium/Mind) <arnout@mind.be>
   # Need to figure out how to make proper hostapd/wpa-supplicant dependency
-  DEPENDS:=+libstdcpp +libuuid +libzmq-nc \
-           +getopt +libncurses +libreadline +terminfo
+  DEPENDS:=+libstdcpp +libuuid +libzmq-nc +libjson-c +libnl-tiny \
+            +libopenssl +getopt +libncurses +libreadline +terminfo
 endef
 
 define Package/prplmesh/description
@@ -77,23 +80,37 @@ define Build/Compile
 	TOOLCHAIN_DIR="$(TOOLCHAIN_DIR)" \
 	BUILD_DIR="$(BUILD_DIR)"         \
 	TARGET_CROSS="$(TARGET_CROSS)"   \
+	PKG_PRPL_BIN_PATH="$(PKG_PRPL_BIN_PATH)" \
+	PKG_PRPL_LIB_PATH="$(PKG_PRPL_LIB_PATH)" \
+	PKG_PRPL_CFG_PATH="$(PKG_PRPL_CFG_PATH)" \
 	CMAKE_TOOLCHAIN_FILE=./prplMesh/tools/cmake/toolchain/owrt.cmake \
 	python$(PYTHON_VERSION) \
 	./$(PKG_PRPL_SUBDIR)/tools/maptools.py build map -f MSGLIB=zmq CMAKE_BUILD_TYPE=$(CONFIG_PRPLMESH_BUILD_TYPE)
 endef
 
 define Build/Install
-	# Strip and install only agent and/or controller files to $(PKG_INSTALL_DIR)
+	# Install agent and controller files to $(PKG_INSTALL_DIR)
+	# Always strip since the binaries are quite big otherwise.
+	$(INSTALL_DIR) "$(PKG_INSTALL_DIR)"
+	$(CP) "$(PKG_BUILD_DIR)/build/install/"* "$(PKG_INSTALL_DIR)/"
+	# get rid of unnecessary stuff
+	rm -Rf "$(PKG_INSTALL_DIR)/host" "$(PKG_INSTALL_DIR)/lib/cmake"
+	rm -Rf "$(PKG_INSTALL_DIR)/include" "$(PKG_INSTALL_DIR)/bin/tests"
+	# strip all executables and libs (they are pretty big for embedded sw)
+	for _f in `find "$(PKG_INSTALL_DIR)" -type f`; do                   \
+	  if file "$$$$_f" | grep -E 'ELF .*not stripped' > /dev/null; then \
+	    $(TOOLCHAIN_DIR)/bin/${TARGET_CROSS}strip "$$$$_f";             \
+	  fi;                                                               \
+	done
+        # Temporary, to make things work as before for glinet-b1300.cmake
+	rm -Rf "$(PKG_INSTALL_DIR)/opt/beerocks"
+	$(INSTALL_DIR) "$(PKG_INSTALL_DIR)/opt/beerocks"
+	( cd "$(PKG_INSTALL_DIR)/opt/beerocks" && find ../.. -maxdepth 1 ! -name 'opt' ! -name '..' -exec mv {} ./ \; )
 endef
 
 define Package/prplmesh/install
 	# Install files necessary for ipk
-	#$(INSTALL_DIR) $(1)/usr/sbin/
-	#$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/prplmesh $(1)/usr/sbin/
-	#$(INSTALL_DIR) $(1)/etc/config/
-	#$(INSTALL_DATA) ./files/prplmesh.config $(1)/etc/config/prplmesh
-	#$(INSTALL_DIR) $(1)/etc/init.d/
-	#$(INSTALL_BIN) ./files/prplmesh.init $(1)/etc/init.d/prplmesh
+	$(CP) "$(PKG_INSTALL_DIR)/opt" "$(1)/"
 endef
 
 $(eval $(call BuildPackage,prplmesh))
