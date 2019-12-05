@@ -34,8 +34,17 @@ PKG_PRPL_LIB_PATH:=/usr/lib
 PKG_PRPL_CFG_PATH:=/etc/beerocks
 # Where we want scripts to be installed
 PKG_PRPL_SCRIPTS_PATH:=/opt/beerocks/scripts
-# Where to store the temporary files
+# Where prrplMesh should store the temporary files on the target
 PKG_PRPL_TMP_PATH:=/tmp/beerocks
+
+# What components we are building
+PKG_PRPL_BUILD_COMPONENTS:=framework common
+ifeq ($(CONFIG_PRPLMESH_CONTROLLER),y)
+  PKG_PRPL_BUILD_COMPONENTS+=controller
+endif
+ifeq ($(CONFIG_PRPLMESH_AGENT),y)
+  PKG_PRPL_BUILD_COMPONENTS+=agent
+endif
 
 # Currently the build needs Python (this dependency will be got rid of)
 PKG_BUILD_DEPENDS:=python/host
@@ -68,9 +77,10 @@ endef
 define Build/Prepare
 	# PrplMesh is expected to be one level deep in the source
 	# tree as it is typically downloaded and built as a part
-	# of a multi-project repo and it stores all the build artefacts
+	# of a multi-project repo, and it stores all the build artefacts
 	# in '../build' folder. If building with USE_SOURCE_DIR point to
-	# the multi-project repo folder (the check below will skip moving the files)
+	# the multi-project repo folder (the check below will skip moving
+	# the files to PKG_PRPL_SUBDIR before build)
 	$(Build/Prepare/Default)
 	mkdir -p $(PKG_BUILD_DIR)/$(PKG_PRPL_SUBDIR)
 	[[ -L "$(PKG_BUILD_DIR)" ]] || ( cd $(PKG_BUILD_DIR)/$(PKG_PRPL_SUBDIR) && \
@@ -84,30 +94,25 @@ endef
 define Build/Compile
 	# Mess with python till we can just use cmake
 	python$(PYTHON_VERSION) -m pip show pyyaml > /dev/null || python$(PYTHON_VERSION) -m pip install pyyaml
-	CMAKE_SYSTEM_PROCESSOR="$(ARCH)"
-	TOOLCHAIN_DIR="$(TOOLCHAIN_DIR)"
-	BUILD_DIR="$(BUILD_DIR)"
-	TARGET_CROSS="$(TARGET_CROSS)"
 	# Build the agent
 	cd $(PKG_BUILD_DIR) && \
 	CMAKE_SYSTEM_PROCESSOR="$(ARCH)" \
 	TOOLCHAIN_DIR="$(TOOLCHAIN_DIR)" \
 	BUILD_DIR="$(BUILD_DIR)"         \
 	TARGET_CROSS="$(TARGET_CROSS)"   \
-	TARGET_BWL_TYPE=$(PRPLMESH_BWL_HAL)      \
 	TARGET_TMP_PATH="$(PKG_PRPL_TMP_PATH)"   \
 	PKG_PRPL_BIN_PATH="$(PKG_PRPL_BIN_PATH)" \
 	PKG_PRPL_LIB_PATH="$(PKG_PRPL_LIB_PATH)" \
 	PKG_PRPL_CFG_PATH="$(PKG_PRPL_CFG_PATH)" \
 	PKG_PRPL_SHARE_PATH="$(PKG_PRPL_SHARE_PATH)" \
+	TARGET_BWL_TYPE=$(CONFIG_PRPLMESH_BWL_HAL)   \
 	CMAKE_TOOLCHAIN_FILE=./prplMesh/tools/cmake/toolchain/owrt.cmake \
 	python$(PYTHON_VERSION) \
-	./$(PKG_PRPL_SUBDIR)/tools/maptools.py build map -f MSGLIB=zmq CMAKE_BUILD_TYPE=$(CONFIG_PRPLMESH_BUILD_TYPE)
+	./$(PKG_PRPL_SUBDIR)/tools/maptools.py build $(PKG_PRPL_BUILD_COMPONENTS) -f MSGLIB=zmq CMAKE_BUILD_TYPE=$(CONFIG_PRPLMESH_BUILD_TYPE)
 endef
 
 define Build/Install
 	# Install agent and controller files to $(PKG_INSTALL_DIR)
-	# Always strip since the binaries are quite big otherwise.
 	$(INSTALL_DIR) "$(PKG_INSTALL_DIR)"
 	$(CP) "$(PKG_BUILD_DIR)/build/install/"* "$(PKG_INSTALL_DIR)/"
 	# get rid of unnecessary stuff
@@ -120,6 +125,12 @@ define Build/Install
 	    $(TOOLCHAIN_DIR)/bin/${TARGET_CROSS}strip "$$$$_f";             \
 	  fi;                                                               \
 	done
+	# move the files to the appropriate locations
+	rm -Rf "$(PKG_INSTALL_DIR)/$(PKG_PRPL_BIN_PATH)"
+	rm -Rf "$(PKG_INSTALL_DIR)/$(PKG_PRPL_SHARE_PATH)"
+	rm -Rf "$(PKG_INSTALL_DIR)/$(PKG_PRPL_CFG_PATH)"
+	rm -Rf "$(PKG_INSTALL_DIR)/$(PKG_PRPL_LIB_PATH)"
+	rm -Rf "$(PKG_INSTALL_DIR)/$(PKG_PRPL_SCRIPTS_PATH)"
 	$(INSTALL_DIR) "$(PKG_INSTALL_DIR)/$(PKG_PRPL_BIN_PATH)"
 	$(INSTALL_DIR) "$(PKG_INSTALL_DIR)/$(PKG_PRPL_SHARE_PATH)"
 	$(INSTALL_DIR) "$(PKG_INSTALL_DIR)/$(PKG_PRPL_CFG_PATH)"
